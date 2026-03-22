@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Zerqon — AI Meeting Assistant</title>
+<link rel="icon" href="icon.ico" type="image/x-icon"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ============================================================
+   ZERQON WEBSITE — Dark / Light dual theme
+   Accent: #c8ff57  |  Font: Syne + DM Sans
+   ============================================================ */
+
+:root {
+  --accent:   #c8ff57;
+  --accent-d: rgba(200,255,87,0.10);
+  --accent-b: rgba(200,255,87,0.18);
+  --bmc:      #FFDD00;
+}
+
+[data-theme="dark"] {
+  --bg:       #07080a;
+  --bg2:      #0c0d10;
+  --bg3:      #111316;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.12);
+  --text:     #f0ede8;
+  --muted:    rgba(240,237,232,0.50);
+  --dim:      rgba(240,237,232,0.25);
+  --card:     #0d0e12;
+  --nav-bg:   rgba(7,8,10,0.88);
+  --shadow:   0 40px 80px rgba(0,0,0,0.5);
+}
+
+[data-theme="light"] {
+  --bg:       #f5f5f3;
+  --bg2:      #ededeb;
+  --bg3:      #e5e5e3;
+  --border:   rgba(0,0,0,0.08);
+  --border2:  rgba(0,0,0,0.15);
+  --text:     #0a0b0d;
+  --muted:    rgba(10,11,13,0.55);
+  --dim:      rgba(10,11,13,0.30);
+  --card:     #ffffff;
+  --nav-bg:   rgba(245,245,243,0.88);
+  --shadow:   0 40px 80px rgba(0,0,0,0.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  height: 64px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.nav-logo img {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+}
+
+.nav-logo-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--text); }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Theme toggle */
+.theme-toggle {
+  width: 48px; height: 26px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 13px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.theme-toggle::after {
+  content: '';
+  width: 18px; height: 18px;
+  background: var(--accent);
+  border-radius: 50%;
+  position: absolute;
+  top: 3px; left: 3px;
+  transition: transform 0.3s;
+}
+
+[data-theme="light"] .theme-toggle::after {
+  transform: translateX(22px);
+}
+
+.theme-icon {
+  position: absolute;
+  font-size: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.theme-icon.moon { left: 6px; }
+.theme-icon.sun  { right: 5px; }
+
+.nav-dl {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--accent);
+  color: #080808;
+  padding: 8px 18px;
+  border-radius: 9px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.nav-dl:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(200,255,87,0.3);
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-glow {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 500px;
+  background: radial-gradient(ellipse, rgba(200,255,87,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--accent-d);
+  border: 1px solid var(--accent-b);
+  border-radius: 100px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  margin-bottom: 28px;
+  animation: fadein 0.6s ease both;
+}
+
+.badge-dot {
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.hero-icon {
+  width: 90px; height: 90px;
+  margin: 0 auto 28px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(200,255,87,0.2);
+  animation: fadein 0.6s 0.05s ease both;
+}
+
+.hero-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(42px, 7vw, 80px);
+  font-weight: 800;
+  letter-spacing: -2.5px;
+  line-height: 1.0;
+  max-width: 900px;
+  margin-bottom: 22px;
+  animation: fadein 0.6s 0.1s ease both;
+}
+
+h1 em { font-style: normal; color: var(--accent); }
+
+.hero-sub {
+  font-size: clamp(15px, 2vw, 18px);
+  color: var(--muted);
+  max-width: 520px;
+  font-weight: 300;
+  line-height: 1.7;
+  margin-bottom: 44px;
+  animation: fadein 0.6s 0.2s ease both;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadein 0.6s 0.3s ease both;
+}
+
+.btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #080808;
+  padding: 15px 30px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 700;
+  transition: all 0.2s;
+  box-shadow: 0 4px 32px rgba(200,255,87,0.25);
+}
+
+.btn-download:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(200,255,87,0.4);
+}
+
+.btn-download-sub {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.6;
+  display: block;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  padding: 15px 24px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-ghost:hover { color: var(--text); border-color: var(--border2); }
+
+.hero-note {
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--dim);
+  animation: fadein 0.6s 0.4s ease both;
+}
+
+/* ── SECTIONS ── */
+.section {
+  padding: 100px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-tag {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(26px, 4vw, 44px);
+  font-weight: 800;
+  letter-spacing: -1.2px;
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+
+.section-sub {
+  font-size: 16px;
+  color: var(--muted);
+  max-width: 480px;
+  font-weight: 300;
+  line-height: 1.7;
+  margin-bottom: 52px;
+}
+
+/* ── FEATURES GRID ── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+}
+
+@media (max-width: 600px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .steps-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.feat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 26px 24px;
+  transition: border-color 0.2s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.feat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-b), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.feat-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+.feat-card:hover::before { opacity: 1; }
+
+.feat-icon {
+  width: 42px; height: 42px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.fi-g { background: var(--accent-d); }
+.fi-b { background: rgba(87,169,255,0.10); }
+.fi-p { background: rgba(169,87,255,0.10); }
+.fi-o { background: rgba(255,169,87,0.10); }
+.fi-t { background: rgba(87,255,200,0.10); }
+.fi-r { background: rgba(255,87,87,0.10); }
+
+.feat-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 7px;
+  letter-spacing: -0.2px;
+}
+
+.feat-desc { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+
+/* ── PLATFORMS ── */
+.platforms-bg {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.platform-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+
+.platform-chip:hover { border-color: var(--accent-b); color: var(--text); }
+
+/* ── HOW IT WORKS ── */
+.steps-bg {
+  background: var(--bg2);
+  border-radius: 24px;
+  margin: 0 24px 80px;
+  max-width: 1052px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.steps-inner { padding: 60px 56px; }
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  position: relative;
+}
+
+.steps-grid::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  left: calc(12.5% + 12px);
+  right: calc(12.5% + 12px);
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent), rgba(200,255,87,0.15));
+}
+
+@media (max-width: 768px) {
+  .steps-grid { grid-template-columns: 1fr 1fr; }
+  .steps-grid::before { display: none; }
+  .steps-inner { padding: 40px 28px; }
+}
+
+.step { padding-right: 20px; }
+
+.step-num {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.step-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+
+.step-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ── API KEY GUIDE ── */
+.api-guide {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.api-steps { display: flex; flex-direction: column; }
+
+.api-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 22px 28px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+
+.api-step:last-child { border-bottom: none; }
+.api-step:hover { background: var(--bg2); }
+
+.api-step-num {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--accent-d);
+  border: 1px solid var(--accent-b);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.api-step-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.api-step-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+.api-step-desc a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.api-step-desc a:hover { text-decoration: underline; }
+
+.code-pill {
+  display: inline-block;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  padding: 1px 7px;
+  font-size: 12px;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  color: var(--accent);
+  margin: 0 2px;
+}
+
+/* ── DOWNLOAD SECTION ── */
+.dl-section {
+  text-align: center;
+  padding: 100px 24px;
+  position: relative;
+}
+
+.dl-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px; height: 400px;
+  background: radial-gradient(ellipse, rgba(200,255,87,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.dl-card {
+  max-width: 520px;
+  margin: 0 auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+  position: relative;
+  z-index: 1;
+}
+
+.dl-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.dl-icon {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.dl-icon img { width: 100%; height: 100%; }
+
+.dl-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.dl-meta { font-size: 13px; color: var(--muted); }
+
+.dl-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--accent);
+  color: #080808;
+  padding: 16px 22px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 32px rgba(200,255,87,0.2);
+  width: 100%;
+}
+
+.dl-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(200,255,87,0.35);
+}
+
+.dl-btn-left { display: flex; align-items: center; gap: 10px; }
+.dl-btn-right { font-size: 12px; color: rgba(8,8,8,0.5); font-weight: 400; text-align: right; }
+
+.dl-note {
+  font-size: 12.5px;
+  color: var(--dim);
+  margin-top: 16px;
+  line-height: 1.6;
+}
+
+.dl-note a { color: var(--accent); text-decoration: none; }
+.dl-note a:hover { text-decoration: underline; }
+
+.dl-secondary {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.dl-sec-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  padding: 11px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.dl-sec-btn:hover { color: var(--text); border-color: var(--border2); }
+
+/* ── BMC + FOOTER ── */
+.bmc-section {
+  text-align: center;
+  padding: 0 24px 80px;
+}
+
+.bmc-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255,221,0,0.06);
+  border: 1px solid rgba(255,221,0,0.15);
+  border-radius: 16px;
+  padding: 18px 26px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.bmc-card:hover {
+  background: rgba(255,221,0,0.11);
+  border-color: rgba(255,221,0,0.28);
+  transform: translateY(-2px);
+}
+
+.bmc-emoji { font-size: 34px; animation: bob 3s ease-in-out infinite; }
+
+@keyframes bob {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-5px) rotate(3deg); }
+}
+
+.bmc-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.bmc-sub   { font-size: 12px; color: var(--muted); }
+
+.bmc-badge {
+  background: var(--bmc);
+  color: #1a1203;
+  padding: 9px 18px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: box-shadow 0.2s;
+}
+
+.bmc-card:hover .bmc-badge { box-shadow: 0 4px 16px rgba(255,221,0,0.3); }
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.footer-logo img { width: 22px; height: 22px; border-radius: 5px; }
+
+.footer-logo-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.footer-links a {
+  font-size: 13px;
+  color: var(--dim);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover { color: var(--text); }
+
+.footer-copy { font-size: 13px; color: var(--dim); }
+
+/* ── Reveal animation ── */
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── Divider ── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 24px;
+  max-width: 1052px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="icon.ico" alt="Zerqon"/>
+    <span class="nav-logo-name">Zerqon</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#platforms">Platforms</a></li>
+    <li><a href="#setup">Setup</a></li>
+    <li><a href="#apikey">API Key</a></li>
+    <li><a href="#download">Download</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+      <span class="theme-icon moon">🌙</span>
+      <span class="theme-icon sun">☀️</span>
+    </button>
+    <a href="#download" class="nav-dl">
+      ↓ Download
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge"><div class="badge-dot"></div> Free & Open Source </div>
+  <div class="hero-icon"><img src="icon.ico" alt="Zerqon Icon"/></div>
+  <h1>Never be caught<br/>off guard <em>again.</em></h1>
+  <p class="hero-sub">
+    Zerqon listens to your meetings, understands the conversation in real time,
+    and quietly suggests what to say next — right on your screen.
+  </p>
+  <div class="hero-actions">
+    <a href="https://drive.google.com/file/d/1SBhHntCBv5vGi0LnQRbqn0JXIxqHtlwM/view?usp=sharing"
+       class="btn-download" id="main-dl-btn">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 3v13M5 16l7 7 7-7"/>
+      </svg>
+      <div>
+        Download for Windows
+        <span class="btn-download-sub">Free · One-click install</span>
+      </div>
+    </a>
+    <a href="https://github.com/adithyankoonoth/zerqon" target="_blank" class="btn-ghost">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+      </svg>
+      Source Code
+    </a>
+  </div>
+  <p class="hero-note">Windows 10 / 11 · 64-bit · Works with headphones · Local speech recognition</p>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="reveal">
+    <div class="section-tag">What Zerqon does</div>
+    <h2 class="section-title">Everything you need<br/>to perform at your best.</h2>
+    <p class="section-sub">Six features working together so you never miss a beat in any conversation.</p>
+  </div>
+  <div class="features-grid reveal">
+    <div class="feat-card">
+      <div class="feat-icon fi-g">🎙️</div>
+      <div class="feat-title">Auto-detects meetings</div>
+      <div class="feat-desc">Detects Zoom, Teams, Google Meet, Discord, and more automatically. No manual trigger needed.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-b">💡</div>
+      <div class="feat-title">Real-time suggestions</div>
+      <div class="feat-desc">A floating overlay shows suggested responses as the conversation develops — powered by Gemini AI.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-p">📋</div>
+      <div class="feat-title">Auto meeting summaries</div>
+      <div class="feat-desc">Generates structured summaries with key points, decisions, and action items when the call ends.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-t">🎧</div>
+      <div class="feat-title">Headphone compatible</div>
+      <div class="feat-desc">Works with any audio input — built-in mic, wired headset, USB mic, or Bluetooth headset.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-o">🔒</div>
+      <div class="feat-title">100% private</div>
+      <div class="feat-desc">Speech recognition runs entirely on your PC via Whisper. Your audio never leaves your machine.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon fi-r">⚡</div>
+      <div class="feat-title">One-click install</div>
+      <div class="feat-desc">Double-click the installer. No Python, no terminal, no technical knowledge needed.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PLATFORMS -->
+<div class="platforms-bg" id="platforms">
+  <section class="section" style="padding: 80px 24px;">
+    <div class="reveal">
+      <div class="section-tag">Compatibility</div>
+      <h2 class="section-title">Works with every<br/>meeting platform.</h2>
+      <p class="section-sub">Detects native apps and browser-based calls automatically.</p>
+    </div>
+    <div class="platform-grid reveal">
+      <div class="platform-chip">🎥 Zoom</div>
+      <div class="platform-chip">💼 Microsoft Teams</div>
+      <div class="platform-chip">🟢 Google Meet</div>
+      <div class="platform-chip">🔷 Cisco Webex</div>
+      <div class="platform-chip">💬 Slack Huddle</div>
+      <div class="platform-chip">🎮 Discord</div>
+      <div class="platform-chip">📞 Skype</div>
+      <div class="platform-chip">🤝 GoTo Meeting</div>
+      <div class="platform-chip">📱 RingCentral</div>
+      <div class="platform-chip">🌐 Whereby</div>
+      <div class="platform-chip">🔗 Jitsi Meet</div>
+      <div class="platform-chip">➕ And more</div>
+    </div>
+  </section>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="steps-bg" id="setup">
+  <div class="steps-inner">
+    <div class="reveal">
+      <div class="section-tag">Setup guide</div>
+      <h2 class="section-title">Up and running<br/>in under 5 minutes.</h2>
+      <p class="section-sub">Four steps. No terminal. No technical knowledge required.</p>
+    </div>
+    <div class="steps-grid reveal">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Download the installer</div>
+        <div class="step-desc">Click the Download button and save <span class="code-pill">Zerqon.Setup.exe</span> to your PC.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Run the installer</div>
+        <div class="step-desc">Double-click the file. Click Yes on the Windows popup. Installs in under 30 seconds.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Enter your API key</div>
+        <div class="step-desc">The setup wizard opens automatically. Paste your free Gemini key when asked.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-title">Join a meeting</div>
+        <div class="step-desc">Open any meeting app. Zerqon detects it and asks if you want AI assistance.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- API KEY GUIDE -->
+<section class="section" id="apikey">
+  <div class="reveal">
+    <div class="section-tag">Getting your API key</div>
+    <h2 class="section-title">Free Gemini key<br/>in 60 seconds.</h2>
+    <p class="section-sub">Zerqon uses Google's Gemini AI. The free tier gives 1,500 requests per day — more than enough for meetings.</p>
+  </div>
+  <div class="api-guide reveal">
+    <div class="api-steps">
+      <div class="api-step">
+        <div class="api-step-num">1</div>
+        <div>
+          <div class="api-step-title">Go to Google AI Studio</div>
+          <div class="api-step-desc">Open <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a> in your browser. Sign in with your Google account.</div>
+        </div>
+      </div>
+      <div class="api-step">
+        <div class="api-step-num">2</div>
+        <div>
+          <div class="api-step-title">Create a new API key</div>
+          <div class="api-step-desc">Click <span class="code-pill">Create API key</span>, select any project, and confirm. Your key will appear instantly.</div>
+        </div>
+      </div>
+      <div class="api-step">
+        <div class="api-step-num">3</div>
+        <div>
+          <div class="api-step-title">Copy the key</div>
+          <div class="api-step-desc">Click the copy icon (📋) next to your key. It starts with <span class="code-pill">AIzaSy</span> and is 39 characters long. Do not share this key with anyone.</div>
+        </div>
+      </div>
+      <div class="api-step">
+        <div class="api-step-num">4</div>
+        <div>
+          <div class="api-step-title">Paste it into Zerqon</div>
+          <div class="api-step-desc">During the setup wizard (Step 2), paste the key into the API key field. Zerqon saves it securely on your PC — it never leaves your machine.</div>
+        </div>
+      </div>
+      <div class="api-step">
+        <div class="api-step-num">5</div>
+        <div>
+          <div class="api-step-title">Change it later if needed</div>
+          <div class="api-step-desc">Right-click the Zerqon tray icon → <span class="code-pill">Settings</span> → API Keys tab → paste a new key anytime.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<div class="dl-section" id="download">
+  <div class="dl-glow"></div>
+  <div class="reveal" style="max-width:600px;margin:0 auto 40px;text-align:center;">
+    <div class="section-tag" style="text-align:center">Download</div>
+    <h2 class="section-title">Start your next meeting<br/>with an unfair advantage.</h2>
+    <p class="section-sub" style="margin:0 auto">Free forever. No account needed. Runs entirely on your machine.</p>
+  </div>
+  <div class="dl-card reveal">
+    <div class="dl-header">
+      <div class="dl-icon"><img src="icon.ico" alt="Zerqon"/></div>
+      <div>
+        <div class="dl-name">Zerqon for Windows</div>
+        <div class="dl-meta">Windows 10 / 11 · 64-bit · ~280 MB</div>
+      </div>
+    </div>
+    <a href="https://drive.google.com/file/d/1SBhHntCBv5vGi0LnQRbqn0JXIxqHtlwM/view?usp=sharing"
+       class="dl-btn" id="dl-btn">
+      <div class="dl-btn-left">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 3v13M5 16l7 7 7-7"/>
+        </svg>
+        Download Zerqon — Free
+      </div>
+      <div class="dl-btn-right">v1.0.0<br/>Free</div>
+    </a>
+    <div class="dl-secondary">
+      <a href="https://github.com/adithyankoonoth/zerqon" target="_blank" class="dl-sec-btn">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        View Source Code
+      </a>
+   
+    </div>
+    <p class="dl-note">
+      Extract the zip, double-click <strong>INSTALL.bat</strong> — everything installs automatically.<br/>
+      You'll need a free <a href="https://aistudio.google.com/app/apikey" target="_blank">Gemini API key</a> during setup.
+    </p>
+  </div>
+</div>
+
+<!-- BUY ME A COFFEE -->
+<div class="bmc-section">
+  <a href="https://buymeacoffee.com/adithyank" target="_blank" class="bmc-card">
+    <span class="bmc-emoji">☕</span>
+    <div>
+      <div class="bmc-title">Enjoying Zerqon?</div>
+      <div class="bmc-sub">It's free and open source. A coffee keeps it going.</div>
+    </div>
+    <div class="bmc-badge">Buy me a coffee</div>
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">
+    <img src="icon.ico" alt="Zerqon"/>
+    <span class="footer-logo-name">Zerqon</span>
+  </a>
+  <div class="footer-links">
+    <a href="https://github.com/adithyankoonoth/zerqon" target="_blank">GitHub</a>
+    <a href="https://buymeacoffee.com/adithyank" target="_blank">Buy Me a Coffee</a>
+    <a href="https://adithyank.me" target="_blank">Portfolio</a>
+    <a href="https://aistudio.google.com/app/apikey" target="_blank">Get API Key</a>
+  </div>
+  <p class="footer-copy">Built by <a href="https://adithyank.me" target="_blank" style="color:var(--accent);text-decoration:none">adithyank</a> · MIT License</p>
+</footer>
+
+<script>
+// ── Theme ──────────────────────────────────────────────────────────────────
+function getSystemTheme() {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('zerqon-theme', t);
+}
+
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  setTheme(cur === 'dark' ? 'light' : 'dark');
+}
+
+// On load: use saved preference, or system default
+const saved = localStorage.getItem('zerqon-theme');
+setTheme(saved || getSystemTheme());
+
+// Listen for system theme changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  if (!localStorage.getItem('zerqon-theme')) {
+    setTheme(e.matches ? 'dark' : 'light');
+  }
+});
+
+// ── Scroll reveal ──────────────────────────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.10 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ── Nav active state ───────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  nav.style.boxShadow = window.scrollY > 20
+    ? '0 1px 30px rgba(0,0,0,0.15)'
+    : 'none';
+});
+</script>
+</body>
+</html>
